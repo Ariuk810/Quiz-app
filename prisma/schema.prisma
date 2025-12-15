@@ -4,16 +4,15 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-// generator client {
-//   provider = "prisma-client"
-//   output   = "../app/generated/prisma"
-// }
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
 
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
-
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 // model User {
 //   id    Int     @id @default(autoincrement())
@@ -32,44 +31,60 @@
 // }
 
 model Article {
-  id String @id @unique @default(cuid())
-  title String
-  content String
-  summary String
-  userId String 
-  user User @relation(fields: [userId], references: [id])
+  id        String   @id @unique @default(cuid())
+  title     String
+  content   String
+  summary   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
-  uptatedAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
+  quizzes Quiz[]
 }
 
 model User {
-  id String @id @unique @default(cuid())
-  name String?
-  email String @unique
-  articles Article[]
+  id           String        @id @unique @default(cuid())
+  name         String?
+  email        String        @unique
+  articles     Article[]
   quizAttempts QuizAttempt[]
-  userScores UserScore[]
-  createdAt DateTime @default(now())
-  uptatedAt DateTime @default(now())
+  userScores   UserScore[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now())
+}
+
+model Quiz {
+  id           String        @id @unique @default(cuid())
+  question     String
+  options      String[]
+  answer       String
+  articleId    String
+  article      Article       @relation(fields: [articleId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now())
+  quizAttempts QuizAttempt[]
+  userScores   UserScore[]
 }
 
 model QuizAttempt {
-  id String @id @unique @default(cuid())
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  quizId String
-  score Int
+  id             String   @id @unique @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  quizId         String
+  quiz           Quiz     @relation(fields: [quizId], references: [id])
+  score          Int
   totalQuestions Int
   correctAnswers Int
-  attemptedAt DateTime @default(now())
+  attemptedAt    DateTime @default(now())
 }
 
 model UserScore {
-  id String @id @unique @default(cuid())
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  quizId String
-  totalScore Int
+  id          String   @id @unique @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  totalScore  Int
   lastUpdated DateTime @default(now())
 }
