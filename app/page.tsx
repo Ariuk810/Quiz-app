@@ -5,20 +5,33 @@ import { BsStars } from "react-icons/bs";
 import { FaFileAlt } from "react-icons/fa";
 import { MainPage } from "./_components/Main";
 import prisma from "@/lib/prisma";
-
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 export default async function Home() {
-  const users = await prisma.user.findMany();
-  console.log(users, "user baina muubdfgvdjhnfvdsn");
-  const articles = await prisma.article.findMany();
-  console.log(articles, "article baineusduhcbsc");
-  const quiz = await prisma.quiz.findMany();
-  console.log(quiz, "quiz baina uuywtdvfuwydbv");
-
   return (
     <>
       <div className="w-full h-15 flex justify-between p-5">
         <p className="text-black text-2xl">Quiz app</p>
-        <div className="w-9 h-9 rounded-full bg-red-500"></div>
+        <header className="flex items-center justify-end h-14 px-6 border-b">
+          <SignedOut>
+            <SignInButton />
+            <SignUpButton>
+              <button className="ml-3 rounded-full bg-[#6c47ff] px-4 py-2 text-sm font-medium text-white">
+                Sign Up
+              </button>
+            </SignUpButton>
+          </SignedOut>
+
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </header>{" "}
       </div>
       <div className="flex w-full h-[calc(100vh-60px)]">
         <SidebarProvider className="">

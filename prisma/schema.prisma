@@ -31,44 +31,44 @@ datasource db {
 // }
 
 model Article {
-  id        String   @id @unique @default(cuid())
+  id        String   @id @default(cuid())
   title     String
   content   String
   summary   String
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-
-  quizzes Quiz[]
+  updatedAt DateTime @updatedAt
+  quizzes   Quiz[]
 }
 
 model User {
-  id           String        @id @unique @default(cuid())
+  id           String        @id @default(cuid())
+  clerkId      String        @unique
   name         String?
   email        String        @unique
   articles     Article[]
   quizAttempts QuizAttempt[]
   userScores   UserScore[]
   createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Quiz {
-  id           String        @id @unique @default(cuid())
+  id           String        @id @default(cuid())
   question     String
   options      String[]
   answer       String
   articleId    String
   article      Article       @relation(fields: [articleId], references: [id])
   createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   quizAttempts QuizAttempt[]
   userScores   UserScore[]
 }
 
 model QuizAttempt {
-  id             String   @id @unique @default(cuid())
+  id             String   @id @default(cuid())
   userId         String
   user           User     @relation(fields: [userId], references: [id])
   quizId         String
@@ -80,7 +80,7 @@ model QuizAttempt {
 }
 
 model UserScore {
-  id          String   @id @unique @default(cuid())
+  id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   quizId      String

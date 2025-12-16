@@ -1,7 +1,24 @@
+"use client";
 import { BsStars } from "react-icons/bs";
 import { FaFileAlt } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 export const MainPage = () => {
+  const { user } = useUser();
+  console.log(user?.id);
+
+  const router = useRouter();
+
+  const handleGenerate = () => {
+    // if (!isSignedIn) {
+    //   alert("Please sign in to generate quiz");
+    //   router.push("/sign-in");
+    //   return;
+    // }
+
+    console.log("Generate quiz...");
+  };
   return (
     <div className="w-[628px] h-[442px] rounded-lg border border-gray-200 mt-15">
       <div className="p-5">
@@ -31,7 +48,10 @@ export const MainPage = () => {
         ></textarea>
         <div className="flex justify-between">
           <p></p>
-          <button className="w-40 h-10 bg-gray-400 text-white rounded-lg  ">
+          <button
+            className="w-40 h-10 bg-gray-400 text-white rounded-lg  "
+            onClick={handleGenerate}
+          >
             Generate Quiz
           </button>
         </div>
