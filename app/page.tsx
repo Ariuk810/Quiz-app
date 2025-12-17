@@ -6,7 +6,6 @@ import { FaFileAlt } from "react-icons/fa";
 import { MainPage } from "./_components/Main";
 import prisma from "@/lib/prisma";
 import {
-  ClerkProvider,
   SignInButton,
   SignUpButton,
   SignedIn,

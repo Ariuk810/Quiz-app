@@ -38,7 +38,7 @@ model Article {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
   quizzes   Quiz[]
 }
 
@@ -51,7 +51,7 @@ model User {
   quizAttempts QuizAttempt[]
   userScores   UserScore[]
   createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  updatedAt    DateTime      @default(now())
 }
 
 model Quiz {
@@ -62,7 +62,7 @@ model Quiz {
   articleId    String
   article      Article       @relation(fields: [articleId], references: [id])
   createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  updatedAt    DateTime      @default(now())
   quizAttempts QuizAttempt[]
   userScores   UserScore[]
 }
