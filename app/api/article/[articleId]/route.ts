@@ -4,12 +4,22 @@ import { NextRequest, NextResponse } from "next/server";
 // POST /api/article/[articleId] - Update an article
 export async function POST(
   request: NextRequest,
-  { params }: { params: { articleId: string } }
+  { params }: { params: Promise<{ articleId: string }> }
 ) {
   try {
-    const articleId = params.articleId;
+    const { articleId } = await params;
     const body = await request.json();
     const { title, content, summary } = body;
+
+    if (!title && !content && !summary) {
+      return NextResponse.json(
+        {
+          error:
+            "At least one field (title, content, summary) must be provided",
+        },
+        { status: 400 }
+      );
+    }
 
     // Check if article exists
     const existingArticle = await prisma.article.findUnique({
@@ -27,6 +37,7 @@ export async function POST(
         ...(title && { title }),
         ...(content && { content }),
         ...(summary && { summary }),
+        updatedAt: new Date(),
       },
       include: {
         user: {
@@ -49,3 +60,15 @@ export async function POST(
     );
   }
 }
+
+// /api/article/jodisjaoida => article data
+export const GET = async (
+  request: NextRequest,
+  { params }: { params: Promise<{ articleId: string }> }
+) => {
+  try {
+    const { articleId } = await params;
+
+    console.log(articleId);
+  } catch (err) {}
+};

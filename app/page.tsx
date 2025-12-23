@@ -1,10 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import Image from "next/image";
 import { AppSidebar } from "./_components/AppSideBar";
-import { BsStars } from "react-icons/bs";
-import { FaFileAlt } from "react-icons/fa";
 import { MainPage } from "./_components/Main";
-import prisma from "@/lib/prisma";
 import {
   SignInButton,
   SignUpButton,

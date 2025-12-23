@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+"use client";
 
 import {
   Sidebar,
@@ -11,49 +11,67 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
 
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    // url: "#",
-  },
-  {
-    title: "Inbox",
-    // url: "#",
-  },
-  {
-    title: "Calendar",
-    // url: "#",
-  },
-  {
-    title: "Search",
-    // url: "#",
-  },
-  {
-    title: "Settings",
-    url: "#",
-  },
-];
+interface Article {
+  id: string;
+  title: string;
+  createdAt: string;
+}
 
 export function AppSidebar() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useUser();
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        if (!user?.id) {
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch(`/api/articles?userId=${user.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setArticles(data);
+        }
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, [user?.id]);
+
   return (
     <Sidebar className="">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-2xl">History</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-5 mt-5  ">
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="text-[18px]">
-                    <a href={item.url}>
-                      {/* <item.icon /> */}
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
+            <SidebarMenu className="gap-5 mt-5">
+              {loading ? (
+                <SidebarMenuItem>
+                  <span className="text-gray-500">Loading...</span>
                 </SidebarMenuItem>
-              ))}
+              ) : articles.length === 0 ? (
+                <SidebarMenuItem>
+                  <span className="text-gray-500">No articles yet</span>
+                </SidebarMenuItem>
+              ) : (
+                articles.map((article) => (
+                  <SidebarMenuItem key={article.id}>
+                    <SidebarMenuButton asChild className="text-[18px]">
+                      <span className="truncate">{article.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

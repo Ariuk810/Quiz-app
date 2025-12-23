@@ -1,7 +1,8 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// POST /api/generate - Generate article summary and quizzes from content
+// POST /api/generate - Generate article summary and quizzes (max 5 questions) from content using Gemini AI
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -23,28 +24,72 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // TODO: Integrate with AI service (OpenAI, Anthropic, etc.) to generate:
-    // 1. Summary of the article
-    // 2. Quiz questions with options and answers
-    // For now, this is a placeholder structure
+    // Initialize Gemini AI
+    const apiKey = process.env.GOOGLE_AI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Google AI API key not configured" },
+        { status: 500 }
+      );
+    }
 
-    // Placeholder summary generation (replace with actual AI call)
-    const summary = content.substring(0, 200) + "..."; // Simple truncation as placeholder
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // Placeholder quiz generation (replace with actual AI call)
-    // In a real implementation, you would call an AI service here
-    const generatedQuizzes = [
-      {
-        question: "What is the main topic of this article?",
-        options: ["Topic A", "Topic B", "Topic C", "Topic D"],
-        answer: "Topic A",
-      },
-      {
-        question: "What is a key point mentioned in the article?",
-        options: ["Point 1", "Point 2", "Point 3", "Point 4"],
-        answer: "Point 1",
-      },
-    ];
+    // Generate summary using Gemini
+    const summaryPrompt = `Please generate a concise summary (around 200-300 words) for the following article:
+
+Title: ${title}
+
+Content:
+${content}
+
+Summary:`;
+
+    const summaryResult = await model.generateContent(summaryPrompt);
+    const summaryResponse = await summaryResult.response;
+    const summary = summaryResponse.text().trim();
+
+    // Generate quizzes using Gemini (maximum 5 questions)
+    const quizPrompt = `Based on the following article, generate up to 5 multiple choice quiz questions. Each question should have:
+- A clear, concise question
+- 4 answer options (options should be in an array format)
+- The correct answer (must be one of the options)
+
+Generate maximum 5 questions. Format your response as a JSON array like this:
+[
+  {
+    "question": "Question text here?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "answer": "Option A"
+  }
+]
+
+Title: ${title}
+
+Content:
+${content}
+
+Summary: ${summary}
+
+Return only the JSON array, no other text:`;
+
+    const quizResult = await model.generateContent(quizPrompt);
+    const quizResponse = await quizResult.response;
+    const quizText = quizResponse.text().trim();
+
+    // Parse JSON from response (may have markdown code blocks)
+    let quizJson = quizText;
+    if (quizText.includes("```json")) {
+      quizJson = quizText.split("```json")[1].split("```")[0].trim();
+    } else if (quizText.includes("```")) {
+      quizJson = quizText.split("```")[1].split("```")[0].trim();
+    }
+
+    const generatedQuizzes = JSON.parse(quizJson);
+
+    // Limit to maximum 5 questions
+    const quizzesToCreate = generatedQuizzes.slice(0, 5);
 
     // Create article
     const article = await prisma.article.create({
@@ -67,15 +112,16 @@ export async function POST(request: NextRequest) {
 
     // Create quizzes for the article
     const createdQuizzes = await Promise.all(
-      generatedQuizzes.map((quiz) =>
-        prisma.quiz.create({
-          data: {
-            question: quiz.question,
-            options: quiz.options,
-            answer: quiz.answer,
-            articleId: article.id,
-          },
-        })
+      quizzesToCreate.map(
+        (quiz: { question: string; options: string[]; answer: string }) =>
+          prisma.quiz.create({
+            data: {
+              question: quiz.question,
+              options: quiz.options,
+              answer: quiz.answer,
+              articleId: article.id,
+            },
+          })
       )
     );
 
