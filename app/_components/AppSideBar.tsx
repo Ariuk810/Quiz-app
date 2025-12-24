@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-
+import { useRouter } from "next/navigation";
 interface Article {
   id: string;
   title: string;
@@ -21,6 +21,7 @@ interface Article {
 }
 
 export function AppSidebar() {
+  const router = useRouter();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
@@ -67,7 +68,12 @@ export function AppSidebar() {
                 articles.map((article) => (
                   <SidebarMenuItem key={article.id}>
                     <SidebarMenuButton asChild className="text-[18px]">
-                      <span className="truncate">{article.title}</span>
+                      <span
+                        className="truncate"
+                        onClick={() => router.push(`articles/${article.id}`)}
+                      >
+                        {article.title}
+                      </span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))

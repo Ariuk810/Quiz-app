@@ -1,13 +1,48 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-// POST /api/article/[articleId] - Update an article
-export async function POST(
+// GET /api/article/[articleId] - Get single article
+export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ articleId: string }> }
+  { params }: { params: { articleId: string } }
 ) {
   try {
-    const { articleId } = await params;
+    const { articleId } = params;
+
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!article) {
+      return NextResponse.json({ error: "Article not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(article, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching article:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch article" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/article/[articleId] - Update article
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { articleId: string } }
+) {
+  try {
+    const { articleId } = params;
     const body = await request.json();
     const { title, content, summary } = body;
 
@@ -21,7 +56,6 @@ export async function POST(
       );
     }
 
-    // Check if article exists
     const existingArticle = await prisma.article.findUnique({
       where: { id: articleId },
     });
@@ -30,22 +64,16 @@ export async function POST(
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
 
-    // Update article
     const updatedArticle = await prisma.article.update({
       where: { id: articleId },
       data: {
         ...(title && { title }),
         ...(content && { content }),
         ...(summary && { summary }),
-        updatedAt: new Date(),
       },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+          select: { id: true, name: true, email: true },
         },
         quizzes: true,
       },
@@ -60,15 +88,3 @@ export async function POST(
     );
   }
 }
-
-// /api/article/jodisjaoida => article data
-export const GET = async (
-  request: NextRequest,
-  { params }: { params: Promise<{ articleId: string }> }
-) => {
-  try {
-    const { articleId } = await params;
-
-    console.log(articleId);
-  } catch (err) {}
-};
