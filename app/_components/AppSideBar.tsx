@@ -70,7 +70,7 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild className="text-[18px]">
                       <span
                         className="truncate"
-                        onClick={() => router.push(`articles/${article.id}`)}
+                        onClick={() => router.push(`/articles/${article.id}`)}
                       >
                         {article.title}
                       </span>

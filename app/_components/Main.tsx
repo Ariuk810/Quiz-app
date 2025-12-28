@@ -1,6 +1,7 @@
 "use client";
 import { BsStars } from "react-icons/bs";
 import { FaFileAlt } from "react-icons/fa";
+import { MdArrowBackIos } from "react-icons/md";
 
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
@@ -14,7 +15,10 @@ export const MainPage = () => {
   // SUMMURY USESTATE SHUU
   const [summary, setSummary] = useState<string | null>(null);
   const [step, setStep] = useState<"form" | "summary">("form");
+  // summary dotor see content harah useState
+  const [seeContent, setSeeContent] = useState(false);
 
+  // ene bol CLERK
   const { user } = useUser();
 
   const handleGenerateSummary = async () => {
@@ -46,7 +50,6 @@ export const MainPage = () => {
       const data = await response.json();
       setSummary(data.summary);
       setStep("summary");
-
       if (!response.ok) {
         throw new Error(data.error || "Article үүсгэхэд алдаа гарлаа");
       }
@@ -66,38 +69,54 @@ export const MainPage = () => {
   // SUMMARY (2.2)
   if (step === "summary" && summary) {
     return (
-      <div className="w-[628px] rounded-lg border border-gray-200 mt-15">
-        <div className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <BsStars size={28} />
-            <h3 className="text-2xl font-bold">Article Quiz Generator</h3>
-          </div>
+      <>
+        <div
+          className="w-12 h-10 bg-white border border-gray-300 rounded-lg flex justify-center items-center "
+          onClick={() => setStep("form")}
+        >
+          <MdArrowBackIos />
+        </div>
+        <div className="w-[628px] rounded-lg border border-gray-200 mt-15">
+          <div className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <BsStars size={28} />
+              <h3 className="text-2xl font-bold">Article Quiz Generator</h3>
+            </div>
+            <p className="text-gray-500 mb-2">Summarized content</p>
 
-          <p className="text-gray-500 mb-2">Summarized content</p>
+            <h4 className="text-lg font-semibold mb-3">{title}</h4>
 
-          <h4 className="text-lg font-semibold mb-3">{title}</h4>
+            <p className="text-gray-700 leading-relaxed mb-6">{summary}</p>
 
-          <p className="text-gray-700 leading-relaxed mb-6">{summary}</p>
+            <div className="flex justify-between">
+              <button
+                className="px-4 py-2 border rounded-lg"
+                onClick={() => {
+                  setSeeContent(true);
+                }}
+              >
+                See content
+              </button>
+              {seeContent ? (
+                <div className="backdrop-blur-md w-100 h-100 rounded-lg border border-gray-300 bg-white">
+                  <p>{content}</p>
+                </div>
+              ) : (
+                <div></div>
+              )}
 
-          <div className="flex justify-between">
-            <button
-              className="px-4 py-2 border rounded-lg"
-              onClick={() => setStep("form")}
-            >
-              See content
-            </button>
-
-            <button className="px-4 py-2 bg-black text-white rounded-lg">
-              Take a quiz
-            </button>
+              <button className="px-4 py-2 bg-black text-white rounded-lg">
+                Take a quiz
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="w-[628px] h-[442px] rounded-lg border border-gray-200 mt-15">
+    <div className="w-[628px] h-[442px] rounded-lg border border-gray-200 mt-15 ">
       <div className="p-5">
         <div className="flex items-center gap-2">
           <BsStars size={30} />

@@ -4,12 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 // GET /api/article/[articleId] - Get single article
 export async function GET(
   request: NextRequest,
-  { params }: { params: { articleId: string } }
+  { params }: { params: Promise<{ articleId: string }> }
 ) {
   try {
-    const { articleId } = params;
+    const { articleId } = await params;
 
-    const article = await prisma.article.findUnique({
+    const article = await prisma.article.findFirst({
       where: { id: articleId },
       include: {
         user: {

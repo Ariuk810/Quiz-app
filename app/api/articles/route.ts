@@ -82,7 +82,7 @@ export const POST = async (request: NextRequest) => {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Generate summary using Gemini
-    const prompt = `Please generate a concise summary (around 200-300 words) for the following article: Title: ${title}. Content:${content}`;
+    const prompt = `Please generate a concise summary (around 1-3 sentences) for the following article: Title: ${title}. Content:${content}`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
