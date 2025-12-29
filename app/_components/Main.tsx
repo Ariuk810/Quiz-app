@@ -76,7 +76,7 @@ export const MainPage = () => {
         >
           <MdArrowBackIos />
         </div>
-        <div className="w-[628px] rounded-lg border border-gray-200 mt-15">
+        <div className="w-[628px] rounded-lg border border-gray-200 mt-15 ">
           <div className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <BsStars size={28} />
@@ -97,17 +97,34 @@ export const MainPage = () => {
               >
                 See content
               </button>
-              {seeContent ? (
-                <div className="backdrop-blur-md w-100 h-100 rounded-lg border border-gray-300 bg-white">
-                  <p>{content}</p>
-                </div>
-              ) : (
-                <div></div>
-              )}
-
               <button className="px-4 py-2 bg-black text-white rounded-lg">
                 Take a quiz
               </button>
+              {seeContent && (
+                <div
+                  className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center"
+                  onClick={() => setSeeContent(false)}
+                >
+                  <div
+                    className=" w-[520px] max-h-[420px] bg-white rounded-x shadow-xl p-6 overflow-y-auto relative"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Close button */}
+                    <button
+                      className="absolute top-4 right-4 text-gray-400 hover:text-black"
+                      onClick={() => setSeeContent(false)}
+                    >
+                      ✕
+                    </button>
+
+                    <h3 className="text-xl font-semibold mb-4">{title}</h3>
+
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                      {content}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
