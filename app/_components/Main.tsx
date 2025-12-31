@@ -2,16 +2,19 @@
 import { BsStars } from "react-icons/bs";
 import { FaFileAlt } from "react-icons/fa";
 import { MdArrowBackIos } from "react-icons/md";
+import { GrNext } from "react-icons/gr";
 
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
+import { TakeQuiz } from "./TakeQuiz";
 
 export const MainPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  // const [success, setSuccess] = useState(false);
+
   // SUMMURY USESTATE SHUU
   const [summary, setSummary] = useState<string | null>(null);
   const [step, setStep] = useState<"form" | "summary">("form");
@@ -35,7 +38,7 @@ export const MainPage = () => {
     try {
       setLoading(true);
       setError(null);
-      setSuccess(false);
+      // setSuccess(false);
 
       const response = await fetch("/api/articles", {
         method: "POST",
@@ -50,11 +53,12 @@ export const MainPage = () => {
       const data = await response.json();
       setSummary(data.summary);
       setStep("summary");
+
       if (!response.ok) {
         throw new Error(data.error || "Article үүсгэхэд алдаа гарлаа");
       }
 
-      setSuccess(true);
+      // setSuccess(true);
       // setTitle("");
       // setContent("");
 
@@ -90,16 +94,14 @@ export const MainPage = () => {
 
             <div className="flex justify-between">
               <button
-                className="px-4 py-2 border rounded-lg"
+                className="px-4 py-2 border rounded-lg cursor-pointer"
                 onClick={() => {
                   setSeeContent(true);
                 }}
               >
                 See content
               </button>
-              <button className="px-4 py-2 bg-black text-white rounded-lg">
-                Take a quiz
-              </button>
+              <TakeQuiz />
               {seeContent && (
                 <div
                   className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center"
@@ -133,50 +135,58 @@ export const MainPage = () => {
   }
 
   return (
-    <div className="w-[628px] h-[442px] rounded-lg border border-gray-200 mt-15 ">
-      <div className="p-5">
-        <div className="flex items-center gap-2">
-          <BsStars size={30} />
-          <h3 className="text-3xl font-bold">Article Quiz Generator</h3>
-        </div>
-        <p className="text-gray-500 mt-2">
-          Paste your article below to generate a summarize and quiz question.
-          Your articles will saved in the sidebar for future reference.
-        </p>
-        <div className="flex items-center mt-5 gap-2">
-          <FaFileAlt size={20} />
-          <p className="text-gray-500  ">New Article</p>
-        </div>
-        <input
-          className="w-full h-10 rounded-lg border border-gray-300 mt-2 pl-2"
-          placeholder="Enter a title for your article..."
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <div className="flex items-center mt-5 gap-2">
-          <FaFileAlt size={20} />
-          <p className="text-gray-500  ">Article content </p>
-        </div>
-        <textarea
-          className="w-full h-[120px] rounded-lg border border-gray-300 mt-2 p-2"
-          placeholder="Paste your article content here..."
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+    <>
+      <div
+        className="w-12 h-10 bg-white border border-gray-300 rounded-lg flex justify-center items-center "
+        onClick={() => setStep("summary")}
+      >
+        <GrNext />
+      </div>
+      <div className="w-[628px] h-[442px] rounded-lg border border-gray-200 mt-15 ">
+        <div className="p-5">
+          <div className="flex items-center gap-2">
+            <BsStars size={30} />
+            <h3 className="text-3xl font-bold">Article Quiz Generator</h3>
+          </div>
+          <p className="text-gray-500 mt-2">
+            Paste your article below to generate a summarize and quiz question.
+            Your articles will saved in the sidebar for future reference.
+          </p>
+          <div className="flex items-center mt-5 gap-2">
+            <FaFileAlt size={20} />
+            <p className="text-gray-500  ">New Article</p>
+          </div>
+          <input
+            className="w-full h-10 rounded-lg border border-gray-300 mt-2 pl-2"
+            placeholder="Enter a title for your article..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <div className="flex items-center mt-5 gap-2">
+            <FaFileAlt size={20} />
+            <p className="text-gray-500  ">Article content </p>
+          </div>
+          <textarea
+            className="w-full h-[120px] rounded-lg border border-gray-300 mt-2 p-2"
+            placeholder="Paste your article content here..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
 
-        {error && <div className="mt-2 text-red-500 text-sm">{error}</div>}
+          {error && <div className="mt-2 text-red-500 text-sm">{error}</div>}
 
-        <div className="flex justify-between mt-4">
-          <p></p>
-          <button
-            className="w-40 h-10 bg-gray-400 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={handleGenerateSummary}
-            disabled={loading || !title.trim() || !content.trim()}
-          >
-            {loading ? "Үүсгэж байна..." : "Generate Quiz"}
-          </button>
+          <div className="flex justify-between mt-4">
+            <p></p>
+            <button
+              className="w-40 h-10 bg-gray-400 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleGenerateSummary}
+              disabled={loading || !title.trim() || !content.trim()}
+            >
+              {loading ? "Үүсгэж байна..." : "Generate Quiz"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };

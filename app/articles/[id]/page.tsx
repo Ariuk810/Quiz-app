@@ -1,5 +1,6 @@
 "use client";
 
+import { TakeQuiz } from "@/app/_components/TakeQuiz";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BsStars } from "react-icons/bs";
@@ -17,21 +18,23 @@ export default function ArticlePage() {
   console.log(params);
 
   const [article, setArticle] = useState<Article | null>(null);
+  const [seemore, setSeemore] = useState(false);
 
-  const fetchArticle = async () => {
-    try {
-      const data = await (
-        await fetch(`/api/article/${id}`, {
-          method: "GET",
-        })
-      ).json();
-      setArticle(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
   useEffect(() => {
-    fetchArticle();
+    if (!id) return;
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await fetch(`/api/article/${id}`, { method: "GET" });
+        const data = await res.json();
+        if (isMounted) setArticle(data);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
   // console.log(article);
 
@@ -53,7 +56,42 @@ export default function ArticlePage() {
           <LuBookOpen size={15} />
           <p className="text-gray-500 ">Article content</p>
         </div>
-        <p className="text-gray-700 leading-relaxed mt-5">{article?.content}</p>
+
+        <p className="text-gray-700 leading-relaxed mt-5">
+          {article?.content.slice(0, 400)}
+        </p>
+        <div className="flex justify-between">
+          <p></p>
+          <p onClick={() => setSeemore(true)} className="cursor-pointer">
+            See more ....
+          </p>
+        </div>
+        <TakeQuiz />
+        {seemore && (
+          <div
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center"
+            onClick={() => setSeemore(false)}
+          >
+            <div
+              className=" w-[520px] max-h-[420px] bg-white rounded-x shadow-xl p-6 overflow-y-auto relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                className="absolute top-4 right-4 text-gray-400 hover:text-black"
+                onClick={() => setSeemore(false)}
+              >
+                ✕
+              </button>
+
+              <h3 className="text-xl font-semibold mb-4">{article?.title}</h3>
+
+              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {article?.content}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

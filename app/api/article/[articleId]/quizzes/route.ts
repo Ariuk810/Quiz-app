@@ -32,7 +32,7 @@ export async function POST(
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Generate quizzes using Gemini (maximum 5 questions)
     const quizPrompt = `Based on the following article, generate up to 5 multiple choice quiz questions. Each question should have:
@@ -59,7 +59,7 @@ Summary: ${article.summary}
 Return only the JSON array, no other text:`;
 
     const quizResult = await model.generateContent(quizPrompt);
-    const quizResponse = await quizResult.response;
+    const quizResponse = quizResult.response;
     const quizText = quizResponse.text().trim();
 
     // Parse JSON from response (may have markdown code blocks)

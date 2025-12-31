@@ -57,7 +57,7 @@ export const POST = async (request: NextRequest) => {
     }
 
     // Find or create user by Clerk ID
-    let user = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
 
@@ -111,7 +111,7 @@ export const POST = async (request: NextRequest) => {
 
     // Check for specific Prisma errors
     if (error && typeof error === "object" && "code" in error) {
-      const prismaError = error as { code: string; meta?: any };
+      const prismaError = error as { code: string; meta?: unknown };
       if (prismaError.code === "P2002") {
         return NextResponse.json(
           { error: "Database constraint error. Please try again." },
