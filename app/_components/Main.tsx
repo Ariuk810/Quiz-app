@@ -58,10 +58,6 @@ export const MainPage = () => {
         throw new Error(data.error || "Article үүсгэхэд алдаа гарлаа");
       }
 
-      // setSuccess(true);
-      // setTitle("");
-      // setContent("");
-
       console.log("Article амжилттай үүслээ:", data);
     } catch (error) {
       console.error("Алдаа:", error);

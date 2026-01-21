@@ -5,7 +5,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 // POST /api/article/[articleId]/quizzes - Generate quizzes (max 5 questions) for an existing article using AI
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ articleId: string }> }
+  { params }: { params: Promise<{ articleId: string }> },
 ) {
   try {
     const { articleId } = await params;
@@ -22,12 +22,24 @@ export async function POST(
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
 
+    // ✅ Хэрвээ өмнө нь quiz үүссэн бол дахиж generate хийхгүй
+    if (article.quizzes && article.quizzes.length > 0) {
+      return NextResponse.json(
+        {
+          message: "Quizzes already exist",
+          quizzes: article.quizzes,
+          reused: true,
+        },
+        { status: 200 },
+      );
+    }
+
     // Initialize Gemini AI
     const apiKey = process.env.GOOGLE_AI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
         { error: "Google AI API key not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -80,21 +92,21 @@ Return only the JSON array, no other text:`;
       if (!quiz.question || !quiz.options || !quiz.answer) {
         return NextResponse.json(
           { error: "Each quiz must have question, options, and answer" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       if (!Array.isArray(quiz.options)) {
         return NextResponse.json(
           { error: "Options must be an array" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       if (!quiz.options.includes(quiz.answer)) {
         return NextResponse.json(
           { error: "Answer must be one of the options" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -110,8 +122,8 @@ Return only the JSON array, no other text:`;
               answer: quiz.answer,
               articleId: articleId,
             },
-          })
-      )
+          }),
+      ),
     );
 
     return NextResponse.json(
@@ -119,13 +131,13 @@ Return only the JSON array, no other text:`;
         message: "Quizzes generated successfully",
         quizzes: createdQuizzes,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Error generating quizzes:", error);
     return NextResponse.json(
       { error: "Failed to generate quizzes" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

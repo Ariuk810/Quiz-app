@@ -15,7 +15,7 @@ type Article = {
 export default function ArticlePage() {
   const params = useParams();
   const id = params?.id as string;
-  // console.log(params);
+  console.log(params, "params");
 
   const [article, setArticle] = useState<Article | null>(null);
   const [seemore, setSeemore] = useState(false);
