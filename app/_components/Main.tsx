@@ -3,10 +3,12 @@ import { BsStars } from "react-icons/bs";
 import { FaFileAlt } from "react-icons/fa";
 import { MdArrowBackIos } from "react-icons/md";
 import { GrNext } from "react-icons/gr";
-
+import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
-import { TakeQuiz } from "./TakeQuiz";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+// import { TakeQuiz } from "./TakeQuiz";
 
 export const MainPage = () => {
   const [title, setTitle] = useState("");
@@ -23,7 +25,8 @@ export const MainPage = () => {
 
   // ene bol CLERK
   const { user } = useUser();
-
+  const [articleId, setArticleId] = useState<string | null>(null);
+  const router = useRouter();
   const handleGenerateSummary = async () => {
     if (!title.trim() || !content.trim()) {
       setError("Title болон content хоёулаа шаардлагатай");
@@ -52,6 +55,7 @@ export const MainPage = () => {
 
       const data = await response.json();
       setSummary(data.summary);
+      setArticleId(data.id);
       setStep("summary");
 
       if (!response.ok) {
@@ -97,7 +101,14 @@ export const MainPage = () => {
               >
                 See content
               </button>
-              <TakeQuiz />
+
+              <Button
+                className="px-4 py-2 bg-black text-white rounded-lg"
+                onClick={() => router.push(`/articles/${articleId}/quizzes`)}
+              >
+                Take a Quiz
+              </Button>
+
               {seeContent && (
                 <div
                   className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center"

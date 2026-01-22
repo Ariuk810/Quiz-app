@@ -1,10 +1,13 @@
 "use client";
 
-import { TakeQuiz } from "@/app/_components/TakeQuiz";
+// import { TakeQuiz } from "@/app/_components/TakeQuiz";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BsStars } from "react-icons/bs";
 import { LuBookOpen } from "react-icons/lu";
+
 type Article = {
   id: string;
   title: string;
@@ -70,7 +73,13 @@ export default function ArticlePage() {
               See more ....
             </p>
           </div>
-          <TakeQuiz />
+
+          <Link href={`/articles/${id}/quizzes`}>
+            <Button className="px-4 py-2 bg-black text-white rounded-lg">
+              Take a Quiz
+            </Button>
+          </Link>
+
           {seemore && (
             <div
               className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center"
