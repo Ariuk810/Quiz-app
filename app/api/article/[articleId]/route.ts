@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 // GET /api/article/[articleId] - Get single article
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ articleId: string }> }
+  { params }: { params: Promise<{ articleId: string }> },
 ) {
   try {
     const { articleId } = await params;
@@ -31,7 +31,7 @@ export async function GET(
     console.error("Error fetching article:", error);
     return NextResponse.json(
       { error: "Failed to fetch article" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -39,10 +39,10 @@ export async function GET(
 // POST /api/article/[articleId] - Update article
 export async function POST(
   request: NextRequest,
-  { params }: { params: { articleId: string } }
+  { params }: { params: Promise<{ articleId: string }> },
 ) {
   try {
-    const { articleId } = params;
+    const { articleId } = await params;
     const body = await request.json();
     const { title, content, summary } = body;
 
@@ -52,7 +52,7 @@ export async function POST(
           error:
             "At least one field (title, content, summary) must be provided",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -84,7 +84,7 @@ export async function POST(
     console.error("Error updating article:", error);
     return NextResponse.json(
       { error: "Failed to update article" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
