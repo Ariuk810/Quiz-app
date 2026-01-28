@@ -7,7 +7,7 @@
     "build": "npm run generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "generate": "npx prisma@latest generate"
+    "generate": "prisma generate"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.3",

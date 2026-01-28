@@ -1,0 +1,4 @@
+DATABASE_URL="postgresql://postgres.kougfawplnfkzauyfvfk:Arvinbileg0810@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
+GOOGLE_AI_API_KEY=AIzaSyBgmcuH8iGRqlcyDqepAFZXVNsDMCytxDA
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_cG9wdWxhci1tZWVya2F0LTgyLmNsZXJrLmFjY291bnRzLmRldiQ
+CLERK_SECRET_KEY=sk_test_CVJ7z0GN59aP9VdvK37i1AxB8EiE6RZFzxX56E8cqv
